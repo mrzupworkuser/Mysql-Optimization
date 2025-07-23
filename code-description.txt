@@ -1,0 +1,46 @@
+# Larashard – Laravel User Sharding Demo
+
+**Larashard** is a demo Laravel 10 application that shows how to implement a simple horizontal sharding pattern. Users live in a primary database, while each user’s related data (addresses) are written to one of three shard databases chosen with a modulus‑hash strategy.
+
+---
+
+## 🏠 Project Structure
+
+```text
+app/
+├─ Http/
+│  ├─ Controllers/
+│  └─ Requests/
+├─ Models/
+│  ├─ User.php
+│  └─ Address.php
+├─ ShardResolver.php
+└─
+```
+
+## Databases
+
+| Connection        | Purpose                       |
+| ----------------- | ----------------------------- |
+| `laravel`         | Primary DB – stores `users`   |
+| `laravel_shard_1` | Shard DB – stores `addresses` |
+| `laravel_shard_2` | Shard DB – stores `addresses` |
+| `laravel_shard_3` | Shard DB – stores `addresses` |
+
+## 🖥 API Reference
+
+| Method | Endpoint             | Description                      |
+| ------ | -------------------- | -------------------------------- |
+| POST   | `/api/v1/users`      | Create user + addresses          |
+| PUT    | `/api/v1/users/{id}` | Update user + addresses          |
+| GET    | `/api/v1/users`      | List users (with addresses)      |
+| GET    | `/api/v1/users/{id}` | Get single user (with addresses) |
+| DELETE | `/api/v1/users/{id}` | Delete user + addresses          |
+
+## 🧠 How It Works
+
+- User write → main DB (laravel).
+- System calculates shard, updates db_connection.
+- Address write → chosen shard DB.
+- Relationship dynamically selects the shard via db_connection.
+- Deletes cascade via model event.
